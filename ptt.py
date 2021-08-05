@@ -115,6 +115,6 @@ def getImage(reqURL,folder):
 
 
 index_page=beauty_index_page()
-findPage(index_page=index_page, page=index_page.max_page, last_page=3735)
-# getImage('https://www.ptt.cc/bbs/cat/M.1627994389.A.1AA.html','cat')
+# findPage(index_page=index_page, page=index_page.max_page, last_page=3735)
+
 
