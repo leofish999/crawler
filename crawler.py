@@ -76,3 +76,21 @@ class crawler():
             
         except:
             print(traceback.format_exc())
+
+
+class reverse_crawler(crawler):
+    def set_first_last_page(self):
+        last_page=self.total_page-self.page_range+1
+        if last_page<1:
+            last_page=1
+        # first page, last page, order    
+        return (self.total_page,last_page-1,-1)
+
+
+class non_reverse_crawler(crawler):
+    def set_first_last_page(self):
+        last_page=self.page_range
+        if last_page>self.total_page:
+            last_page=self.total_page
+        # first page, last page, order    
+        return (1,last_page+1,1)

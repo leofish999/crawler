@@ -1,12 +1,12 @@
 import requests, bs4, re, traceback
 from time import gmtime, strftime, sleep
-from crawler import crawler
-class ptt_base_crawler(crawler):
+from crawler import reverse_crawler
+class ptt_base_crawler(reverse_crawler):
     def __init__(self,page_range):
         self.page_range=page_range
         self.urlBase='https://www.ptt.cc'
     def checkTitlePattern(self,title):
-        return re.search(r'\[.*[認送]養.*\]|\[.*心得.*\]',title)!=None
+        return True
     def get_page_url_list(self,page):
         ptthtml = requests.get(self.getIndexURL(page), cookies={'over18':'1'})
         objSoup = bs4.BeautifulSoup(ptthtml.text, 'lxml')
@@ -26,27 +26,6 @@ class ptt_base_crawler(crawler):
                 urls.append(pttdiv.find('div','title').find('a')['href'])
         print('url',urls)
         return urls
-    def set_first_last_page(self):
-        last_page=self.total_page-self.page_range+1
-        if last_page<1:
-            last_page=1
-        # first page, last page, order    
-        return (self.total_page,last_page-1,-1)
-        
-    def crawl(self): 
-        page_range_tuple=self.set_first_last_page()
-        for page in range(*page_range_tuple):
-            urls=self.get_page_url_list(page)
-            for url in urls:
-                try:
-                    url=self.CorrectURL(url, self.urlBase)
-                    self.getImage(url)
-                except:
-                    print(traceback.format_exc())
-        
-
-
-
 
     def get_img_url_list(self,reqURL):
         
@@ -88,8 +67,7 @@ class beauty_crawler(ptt_base_crawler):
         self.minPush=10
     def getIndexURL(self, page):
         return f'https://www.ptt.cc/bbs/Beauty/index{page}.html'
-    def checkTitlePattern(self,title):
-        return True
+
 
 
 
