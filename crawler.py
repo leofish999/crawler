@@ -37,3 +37,42 @@ class crawler():
             return url
         else:
             return host+url
+    
+    def get_img_url_list(self,reqURL):
+        return []
+    
+    def getImage(self,reqURL):
+        timer=strftime("%Y_%m_%d_%H_%M_%S", gmtime())
+        try:
+            imgs=self.get_img_url_list(reqURL)
+            for url in imgs:
+                try:
+                    url=self.CorrectURL(url, self.urlBase)
+                    self.download(url,timer)
+                except:
+                    print(traceback.format_exc())
+        except:
+            print(traceback.format_exc())
+        sleep( 5 )
+    
+    def getTotalPage(self):
+        return self.total_page
+    
+    
+    
+    def crawl(self,page=1):
+        try:
+            self.total_page=self.getTotalPage()
+            page_range_tuple=self.set_first_last_page()
+            for page in range(*page_range_tuple):
+                urls=self.get_page_url_list(page)
+
+                for url in urls:
+                    try:
+                        url=self.CorrectURL(url, self.urlBase)
+                        self.getImage(url)
+                    except:
+                        print(traceback.format_exc())
+            
+        except:
+            print(traceback.format_exc())
