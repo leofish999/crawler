@@ -42,6 +42,7 @@ class crawler():
         return []
     
     def getImage(self,reqURL):
+        print('getImage')
         timer=strftime("%Y_%m_%d_%H_%M_%S", gmtime())
         try:
             imgs=self.get_img_url_list(reqURL)

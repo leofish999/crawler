@@ -1,9 +1,9 @@
 import requests, bs4,os, traceback
 from time import gmtime, strftime, sleep
-from crawler import crawler
+from crawler import non_reverse_crawler
 
 
-class jkf_base_crawler(crawler):
+class jkf_base_crawler(non_reverse_crawler):
     def __init__(self):
         self.urlBase='https://www.jkforum.net/'
         self.total_page=1
@@ -14,12 +14,7 @@ class jkf_base_crawler(crawler):
         total_page=beauty.find('div', class_='pgs').find('div', class_='pg').find('label').find('span').text
         total_page=int(''.join([x for x in total_page if x.isdigit()]))
         return total_page
-    # def set_first_last_page(self):
-    #     last_page=self.page_range
-    #     if last_page>self.total_page:
-    #         last_page=self.total_page
-    #     # first page, last page, order    
-    #     return (1,last_page+1,1)
+
     def get_page_url_list(self,page):
         html=requests.get(self.getIndexURL(page))
         beauty=bs4.BeautifulSoup(html.text,'lxml')
