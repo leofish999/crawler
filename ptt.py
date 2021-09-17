@@ -67,12 +67,14 @@ class beauty_crawler(ptt_base_crawler):
         self.minPush=10
     def getIndexURL(self, page):
         return f'https://www.ptt.cc/bbs/Beauty/index{page}.html'
+    def checkTitlePattern(self,title):
+        return '帥哥' not in title
 
 
 
 
-# index_page=beauty_crawler()
-index_page=cat_crawler()
+index_page=beauty_crawler()
+# index_page=cat_crawler()
 
 index_page.crawl()
 
