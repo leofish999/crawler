@@ -18,7 +18,7 @@ class ptt_base_crawler(reverse_crawler):
             push=pttdiv.find('div','nrec').text
             if push=='爆':
                 push=999
-            if not push.isdecimal():
+            elif not push.isdecimal():
                 push=0
             else:
                 push=int(push)
