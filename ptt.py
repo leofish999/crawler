@@ -40,7 +40,7 @@ class ptt_base_crawler(reverse_crawler):
             if href_photo.startswith('https://i.imgur'):                    # 判斷圖片網址
                 photos.append(href_photo)
         
-        return photos
+        return photos 
 
             
 
