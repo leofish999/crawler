@@ -1,10 +1,11 @@
 import requests, bs4, re, traceback
 from time import gmtime, strftime, sleep
-from crawler import reverse_crawler
-class ptt_base_crawler(reverse_crawler):
+from crawler import image_crawler
+class ptt_base_crawler(image_crawler):
     def __init__(self,page_range):
         self.page_range=page_range
         self.urlBase='https://www.ptt.cc'
+        self.reverse=True
     def checkTitlePattern(self,title):
         return True
     def get_page_url_list(self,page):

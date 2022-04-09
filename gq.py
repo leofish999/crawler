@@ -1,10 +1,11 @@
 import requests, bs4,os, traceback
 from time import gmtime, strftime, sleep
-from crawler import non_reverse_crawler
+from crawler import image_crawler
 
 
-class gq_base_crawler(non_reverse_crawler):
+class gq_base_crawler(image_crawler):
     def __init__(self):
+        self.reverse=False
         self.urlBase='https://www.gq.com.tw/'
         self.total_page=999
         self.page_range=2
