@@ -48,29 +48,30 @@ class crawler():
     def getTotalPage(self):
         return self.total_page
     
+    def clearFileOrFolder(self):
+        return ''
+    
+    def findData(self,page):
+        return ''
     
     
     def crawl(self,page=1):
         try:
             self.total_page=self.getTotalPage()
             page_range_tuple=self.set_first_last_page()
+            self.clearFileOrFolder()
             for page in range(*page_range_tuple):
-                urls=self.get_page_url_list(page)
-
-                for url in urls:
-                    try:
-                        url=self.CorrectURL(url, self.urlBase)
-                        self.findData(url)
-                    except:
-                        print(traceback.format_exc())
-            
+                print('page ',page, page_range_tuple)
+                self.findData(page)
         except:
             print(traceback.format_exc())
 
 
 
+
+
 class image_crawler(crawler):
-    def findData(self,reqURL):
+    def get_img(self,reqURL):
         print('getImage')
         timer=strftime("%Y_%m_%d_%H_%M_%S", gmtime())
         try:
@@ -84,6 +85,15 @@ class image_crawler(crawler):
         except:
             print(traceback.format_exc())
         sleep( 5 )
+    
+    def findData(self,page):
+        urls=self.get_page_url_list(page)
+        for url in urls:
+            try:
+                url=self.CorrectURL(url, self.urlBase)
+                self.get_img(url)
+            except:
+                print(traceback.format_exc())
 
 
     def getData(self, url,timer):
@@ -112,7 +122,7 @@ class image_crawler(crawler):
 
 
 class text_crawler(crawler):
-    def findData(self,reqURL):
+    def get_img(self,reqURL):
         return ''
 
 
@@ -124,28 +134,21 @@ class housefun_base_crawler(text_crawler):
         self.reverse=False
         self.urlBase='https://buy.housefun.com.tw/'
         self.total_page=1
-        self.page_range=67
+        self.page_range=1
     def getTotalPage(self):
         return 67
     
-    def crawl(self,page=1):
-        try:
-            self.total_page=self.getTotalPage()
-            page_range_tuple=self.set_first_last_page()
-            filename='housefun.csv'
-            with open(filename, 'w', encoding='utf-8') as out_file:
-                out_file.write(f'name,place,area,price,per_area,floor\n')
-            for page in range(*page_range_tuple):
-                sleep(1)
-                print('page ',page, page_range_tuple)
-                urls=self.get_page_url_list(page)
+    def clearFileOrFolder(self):
+        filename='housefun.csv'
+        with open(filename, 'w', encoding='utf-8') as out_file:
+            out_file.write(f'name,place,area,price,per_area,floor\n')
 
-            
-        except:
-            print(traceback.format_exc())
+    def findData(self,page):
+        sleep(1)
+        urls=self.get_text(page)
 
 
-    def get_page_url_list(self,page):
+    def get_text(self,page):
         headers = { 'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64)\
             AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.101\
             Safari/537.36', }
@@ -165,13 +168,7 @@ class housefun_base_crawler(text_crawler):
                     out_file.write(f'{name},{address},{ping},{price},{float(price)/float(ping)},{floor}\n')
                 except Exception as e:
                     print(f'remove {name}\n',traceback.format_exc())
-        # items=beauty.find('ul', class_='waterfall').find_all('li') # //https://www.jkforum.net/type-736-853.html?forumdisplay&typeid=853&filter=typeid&typeid=853&forumdisplay=&page=2
-        # urls=[]
-        # for item in items:
-        #     if (int(item.find('div', class_='auth').find_all('em')[2].find('em').text)>self.watch_threshold 
-        #     and item.find('div', class_='auth').find_all('em')[1].find('a').text not in self.blackList):
-        #         urls.append(item.find('a')['href'])
-        # print('urls',urls)
+
     
     def getIndexURL(self, page):
         return f'https://buy.housefun.com.tw/region/%E6%96%B0%E5%8C%97%E5%B8%82-%E4%B8%89%E9%87%8D%E5%8D%80_c/?pg={page}'
@@ -206,5 +203,5 @@ class housefun_base_crawler(text_crawler):
 
 
 # indexPage=model_crawler() # 寫真
-indexPage=housefun_base_crawler() #輔導級
+indexPage=housefun_base_crawler() #
 indexPage.crawl() 
