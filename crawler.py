@@ -149,9 +149,6 @@ class text_crawler(crawler):
             )
 
     def getTotalPage(self):
-        # headers = { 'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64)\
-        #     AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.101\
-        #     Safari/537.36', }
         html=requests.get(self.getIndexURL(1), headers=self.headers)
         beauty=bs4.BeautifulSoup(html.text,'lxml')
         return int(beauty.find('ul', {'class':'m-pagination-bd'}).find('a',text='最末頁').attrs['data-value'])
@@ -170,9 +167,6 @@ class text_crawler(crawler):
 
 
     def get_text(self,page):
-        # headers = { 'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64)\
-        #     AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.101\
-        #     Safari/537.36', }
         html=requests.get(self.getIndexURL(page), headers=self.headers)
         beauty=bs4.BeautifulSoup(html.text,'lxml')
         items=beauty.find_all('section', {'class':'m-list-obj'})
@@ -235,6 +229,6 @@ class text_crawler(crawler):
 
 
 
-# indexPage=model_crawler() # 寫真
+
 indexPage=text_crawler('台北市','北投') #
 indexPage.crawl() 
