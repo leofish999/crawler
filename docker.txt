@@ -1,0 +1,9 @@
+docker stop myadmin mysql-volume superset
+docker start mysql-volume superset myadmin
+
+
+superset:
+http://127.0.0.1:8088/ 
+
+phpMayAdmin
+http://127.0.0.1:8080/

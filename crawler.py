@@ -1,5 +1,7 @@
 import requests, bs4,  traceback, re
 from time import gmtime, strftime, sleep
+import pymysql.cursors
+
 
 class crawler():
     def __init__(self):
@@ -37,13 +39,6 @@ class crawler():
             return url
         else:
             return host+url
-    
-    def get_img_url_list(self,reqURL):
-        return []
-    
- 
-
-    
 
     def getTotalPage(self):
         return self.total_page
@@ -121,31 +116,38 @@ class image_crawler(crawler):
 
 
 
+
+
+
+
+
+
 class text_crawler(crawler):
-    def get_img(self,reqURL):
-        return ''
-
-
-
-
-
-class housefun_base_crawler(text_crawler):
     def __init__(self):
+        self.fileName='housefun.csv'
         self.reverse=False
         self.urlBase='https://buy.housefun.com.tw/'
         self.total_page=1
-        self.page_range=1
+        self.page_range=67
+        self.use_csv=False
+        if not self.use_csv:
+            #使用pymysql指令來連接數據庫
+            self.connection=pymysql.connect(host='127.0.0.1',port=3307,user='root',password='my-secret-pw',db='house',cursorclass=pymysql.cursors.DictCursor
+            )
     def getTotalPage(self):
         return 67
     
     def clearFileOrFolder(self):
-        filename='housefun.csv'
-        with open(filename, 'w', encoding='utf-8') as out_file:
-            out_file.write(f'name,place,area,price,per_area,floor\n')
+        if self.use_csv:
+            with open(self.fileName, 'w', encoding='utf-8') as out_file:
+                out_file.write(f'name,place,area,price,per_area,floor\n')
 
     def findData(self,page):
         sleep(1)
         urls=self.get_text(page)
+    
+
+
 
 
     def get_text(self,page):
@@ -155,19 +157,31 @@ class housefun_base_crawler(text_crawler):
         html=requests.get(self.getIndexURL(page), headers=headers)
         beauty=bs4.BeautifulSoup(html.text,'lxml')
         items=beauty.find_all('section', {'class':'m-list-obj'})
-        filename='housefun.csv'
-        with open(filename, 'a', encoding='utf-8') as out_file:
-            for item in items:
-                name=item.find('h1').text.replace('\n',' ').replace(',',' ')
-                address=item.find("address").text
-                ping=item.find("span",{'class':'ping-number'}).find('em').text
-                price=item.find("a",{'class':'discount-price'}).find('em').text.replace(',','')
-                floor=item.find('span',{'class':'floor'}).text.split('/')[0].split('~')[0].strip()
-                try:
-                    print(f'{name},{address},{ping},{price},{float(price)/float(ping)},{floor}')
-                    out_file.write(f'{name},{address},{ping},{price},{float(price)/float(ping)},{floor}\n')
-                except Exception as e:
-                    print(f'remove {name}\n',traceback.format_exc())
+        # filename='housefun.csv'
+        for item in items:
+            name=item.find('h1').text.replace('\n',' ').replace(',',' ')
+            address=item.find("address").text
+            ping=item.find("span",{'class':'ping-number'}).find('em').text
+            price=item.find("a",{'class':'discount-price'}).find('em').text.replace(',','')
+            floor=item.find('span',{'class':'floor'}).text.split('/')[0].split('~')[0].strip()
+            try:
+                print(f'{name},{address},{ping},{price},{float(price)/float(ping)},{floor}')
+                if  self.use_csv:
+                    with open(self.fileName, 'a', encoding='utf-8') as out_file:
+                        out_file.write(f'{name},{address},{ping},{price},{float(price)/float(ping)},{floor}\n')
+                else:
+                    #從數據庫鏈接中得到cursor的數據結構
+                    with self.connection.cursor() as cursor:
+                    #在之前建立的user表格基礎上，插入新數據，這裡使用了一個預編譯的小技巧，避免每次都要重複寫sql的語句
+                        sql=f"INSERT INTO `housefun_buy`\
+                            (`name`, `place`, `area`, `price`, `per_area`, `floor`,create_time) VALUES \
+                            ('{name}', '{address}', '{ping}', '{price}', '{float(price)/float(ping)}', '{floor}', curdate());"
+                        # print(sql)
+                        cursor.execute(sql)
+                        #執行到這一行指令時才是真正改變了數據庫，之前只是緩存在內存中
+                        self.connection.commit()
+            except Exception as e:
+                print(f'remove {name}\n',traceback.format_exc())
 
     
     def getIndexURL(self, page):
@@ -203,5 +217,5 @@ class housefun_base_crawler(text_crawler):
 
 
 # indexPage=model_crawler() # 寫真
-indexPage=housefun_base_crawler() #
+indexPage=text_crawler() #
 indexPage.crawl() 
