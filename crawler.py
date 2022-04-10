@@ -14,15 +14,22 @@ class crawler():
         pass
     
     def reverse_page(self):
-        last_page=self.total_page-self.page_range+1
+        if self.page_range:
+            last_page=self.total_page-self.page_range+1
+        else:
+            last_page=1
+        
         if last_page<1:
             last_page=1
         # first page, last page, order    
         return (self.total_page,last_page-1,-1)
     
     def non_reverse_page(self):
-        last_page=self.page_range
-        if last_page>self.total_page:
+        if self.page_range:
+            last_page=self.page_range
+            if last_page>self.total_page:
+                last_page=self.total_page
+        else:
             last_page=self.total_page
         # first page, last page, order    
         return (1,last_page+1,1)
@@ -123,19 +130,31 @@ class image_crawler(crawler):
 
 
 class text_crawler(crawler):
-    def __init__(self):
+    def __init__(self,city,district):
         self.fileName='housefun.csv'
         self.reverse=False
         self.urlBase='https://buy.housefun.com.tw/'
         self.total_page=1
-        self.page_range=67
+        # page_range=None means page_range=totalPage
+        self.page_range=None
         self.use_csv=False
+        self.district=district
+        self.city=city
+        self.headers = { 'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64)\
+            AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.101\
+            Safari/537.36', }
         if not self.use_csv:
             #使用pymysql指令來連接數據庫
             self.connection=pymysql.connect(host='127.0.0.1',port=3307,user='root',password='my-secret-pw',db='house',cursorclass=pymysql.cursors.DictCursor
             )
+
     def getTotalPage(self):
-        return 67
+        # headers = { 'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64)\
+        #     AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.101\
+        #     Safari/537.36', }
+        html=requests.get(self.getIndexURL(1), headers=self.headers)
+        beauty=bs4.BeautifulSoup(html.text,'lxml')
+        return int(beauty.find('ul', {'class':'m-pagination-bd'}).find('a',text='最末頁').attrs['data-value'])
     
     def clearFileOrFolder(self):
         if self.use_csv:
@@ -151,10 +170,10 @@ class text_crawler(crawler):
 
 
     def get_text(self,page):
-        headers = { 'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64)\
-            AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.101\
-            Safari/537.36', }
-        html=requests.get(self.getIndexURL(page), headers=headers)
+        # headers = { 'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64)\
+        #     AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.101\
+        #     Safari/537.36', }
+        html=requests.get(self.getIndexURL(page), headers=self.headers)
         beauty=bs4.BeautifulSoup(html.text,'lxml')
         items=beauty.find_all('section', {'class':'m-list-obj'})
         # filename='housefun.csv'
@@ -174,8 +193,8 @@ class text_crawler(crawler):
                     with self.connection.cursor() as cursor:
                     #在之前建立的user表格基礎上，插入新數據，這裡使用了一個預編譯的小技巧，避免每次都要重複寫sql的語句
                         sql=f"INSERT INTO `housefun_buy`\
-                            (`name`, `place`, `area`, `price`, `per_area`, `floor`,create_time) VALUES \
-                            ('{name}', '{address}', '{ping}', '{price}', '{float(price)/float(ping)}', '{floor}', curdate());"
+                            (`name`, `place`, `area`, `price`, `per_area`, `floor`, district ,create_time) VALUES \
+                            ('{name}', '{address}', '{ping}', '{price}', '{float(price)/float(ping)}', '{floor}', '{self.district}', curdate());"
                         # print(sql)
                         cursor.execute(sql)
                         #執行到這一行指令時才是真正改變了數據庫，之前只是緩存在內存中
@@ -185,7 +204,7 @@ class text_crawler(crawler):
 
     
     def getIndexURL(self, page):
-        return f'https://buy.housefun.com.tw/region/%E6%96%B0%E5%8C%97%E5%B8%82-%E4%B8%89%E9%87%8D%E5%8D%80_c/?pg={page}'
+        return f'https://buy.housefun.com.tw/region/{self.city}-{self.district}區_c/?pg={page}'
     
 
 
@@ -217,5 +236,5 @@ class text_crawler(crawler):
 
 
 # indexPage=model_crawler() # 寫真
-indexPage=text_crawler() #
+indexPage=text_crawler('台北市','北投') #
 indexPage.crawl() 
