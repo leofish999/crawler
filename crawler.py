@@ -226,9 +226,15 @@ class text_crawler(crawler):
 
 
 
+indexPage1=text_crawler('新北市','三重') #
+indexPage1.crawl()
+
+indexPage2=text_crawler('新北市','新莊') #
+indexPage2.crawl()
+
+indexPage3=text_crawler('新北市','蘆洲') #
+indexPage3.crawl()
 
 
-
-
-indexPage=text_crawler('台北市','北投') #
-indexPage.crawl() 
+indexPage4=text_crawler('台北市','北投') #
+indexPage4.crawl() 
