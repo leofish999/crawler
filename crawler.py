@@ -9,9 +9,6 @@ class crawler():
         self.reverse=True
     def getIndexURL(self, page):
         return ''
-
-    def crawl(self,last_page=None,page=1):
-        pass
     
     def reverse_page(self):
         if self.page_range:
@@ -226,15 +223,32 @@ class text_crawler(crawler):
 
 
 
-indexPage1=text_crawler('新北市','三重') #
-indexPage1.crawl()
-
-indexPage2=text_crawler('新北市','新莊') #
-indexPage2.crawl()
-
-indexPage3=text_crawler('新北市','蘆洲') #
-indexPage3.crawl()
 
 
-indexPage4=text_crawler('台北市','北投') #
-indexPage4.crawl() 
+
+
+#########################################################################################################
+#  temp
+# import datetime
+# now=datetime.datetime.today()
+# future= datetime.datetime(now.year,now.month,now.day+1)
+# # if future.day==now.day:
+# #     break
+# print('wait')
+# diff=future-now
+# sleep(diff.seconds+1000)
+# print(datetime.datetime.today())
+###########################################################################################################
+if __name__ == '__main__':
+    indexPage1=text_crawler('新北市','三重') #
+    indexPage1.crawl()
+
+    indexPage2=text_crawler('新北市','新莊') #
+    indexPage2.crawl()
+
+    indexPage3=text_crawler('新北市','蘆洲') #
+    indexPage3.crawl()
+
+
+    indexPage4=text_crawler('台北市','北投') #
+    indexPage4.crawl() 
